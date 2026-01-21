@@ -28,7 +28,7 @@ variable "slurm_head_node_count" {
 variable "slurm_head_node_type" {
   description = "The slurm head node instance type."
   type        = string
-  default     = "c1a.16x"
+  default     = "c1a.2x"
 }
 
 # This is only required when using an infiniband enabled instance type for the head nodes.
@@ -53,7 +53,7 @@ variable "slurm_login_node_count" {
 variable "slurm_login_node_type" {
   description = "The slurm login node instance type."
   type        = string
-  default     = "c1a.16x"
+  default     = "c1a.2x"
 }
 
 variable "slurm_login_node_reservation_id" {
