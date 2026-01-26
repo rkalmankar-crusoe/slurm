@@ -1,3 +1,11 @@
+- name: Install SLURM packages for compute nodes
+  ansible.builtin.apt:
+    name:
+      - slurmd
+      - slurm-wlm-basic-plugins
+    state: present
+    update_cache: true
+
 - name: Mount /scratch/local
   ansible.builtin.import_role:
     name: raid0
@@ -33,6 +41,14 @@
     opts: "proto=tcp,nconnect=16,spread_reads,spread_writes,remoteports=100.64.0.2-100.64.0.17"
     state: mounted
     fstype: nfs
+
+- name: Create slurmd.service.d directory
+  ansible.builtin.file:
+    path: /etc/systemd/system/slurmd.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
 
 - name: Install override.conf
   ansible.builtin.template:

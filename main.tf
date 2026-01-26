@@ -113,7 +113,9 @@ resource "crusoe_compute_instance" "slurm_compute_node" {
   ssh_key  = local.ssh_public_key
   location = var.location
   project_id = var.project_id
-  image    = var.compute_node_custom_image_name != null ? null : "ubuntu22.04-nvidia-slurm:latest"
+  image    = var.compute_node_custom_image_name != null ? null : (
+    can(regex("gb200", var.slurm_compute_node_type)) ? "ubuntu24.04-nvidia-nvl-arm64-gb200:latest" : "ubuntu22.04-nvidia-slurm:latest"
+  )
   custom_image = var.compute_node_custom_image_name != null ? var.compute_node_custom_image_name : null
   reservation_id = var.slurm_compute_node_reservation_id
   host_channel_adapters = var.slurm_compute_node_ib_partition_id != null ? [{
@@ -141,18 +143,20 @@ resource "crusoe_compute_instance" "slurm_compute_node" {
   }]
 }
 
-resource "crusoe_vpc_firewall_rule" "allow_grafana_access" {
-  count             = var.enable_observability ? 1 : 0 
-  action            = "allow"
-  destination       = crusoe_compute_instance.slurm_head_node[0].network_interfaces[0].private_ipv4.address
-  destination_ports = "3000"
-  direction         = "ingress"
-  name              = "grafana-slurm-access"
-  network           = crusoe_compute_instance.slurm_head_node[0].network_interfaces[0].network
-  protocols         = "tcp"
-  source            = "0.0.0.0/0"
-  source_ports      = "1-65535"
-}
+# TODO: Fix network reference - network_interfaces doesn't have .network attribute
+# For now, Grafana can be accessed via SSH tunnel: ssh -L 3000:localhost:3000 ubuntu@<head_node_ip>
+# resource "crusoe_vpc_firewall_rule" "allow_grafana_access" {
+#   count             = var.enable_observability ? 1 : 0
+#   action            = "allow"
+#   destination       = crusoe_compute_instance.slurm_head_node[0].network_interfaces[0].private_ipv4.address
+#   destination_ports = "3000"
+#   direction         = "ingress"
+#   name              = "grafana-slurm-access"
+#   network           = crusoe_compute_instance.slurm_head_node[0].network_interfaces[0].network
+#   protocols         = "tcp"
+#   source            = "0.0.0.0/0"
+#   source_ports      = "1-65535"
+# }
 
 resource "local_file" "node_hostfile" {
   count = var.enable_imex_support ? 1 : 0

@@ -142,13 +142,13 @@ variable "grafana_admin_password" {
 variable "slurm_data_disk_size" {
   description = "The slurm data disk size."
   type        = string
-  default     = "512GiB"
+  default     = "1024GiB"
 }
 
 variable "slurm_shared_disk_nfs_home_size" {
   description = "The slurm nfs home directory size."
   type        = string
-  default     = "512GiB"
+  default     = "1024GiB"
 }
 
 variable "slurmctld_disk_size" {

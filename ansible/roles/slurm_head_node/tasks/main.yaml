@@ -1,3 +1,12 @@
+- name: Install SLURM packages for head node
+  ansible.builtin.apt:
+    name:
+      - slurmctld
+      - slurm-wlm-basic-plugins
+      - slurm-client
+    state: present
+    update_cache: true
+
 - name: Mount /var/spool/slurmctld
   ansible.posix.mount:
     src: "100.64.0.2:/volumes/{{ slurmctld_disk_id }}"
