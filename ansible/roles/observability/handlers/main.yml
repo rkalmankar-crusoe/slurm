@@ -34,4 +34,10 @@
 - name: restart docker
   systemd:
     name: docker
-    state: restarted 
+    state: restarted
+
+- name: restart nvitop-exporter
+  systemd:
+    name: nvitop-exporter
+    state: restarted
+    enabled: yes 

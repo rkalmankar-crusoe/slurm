@@ -169,6 +169,29 @@
             count: -1
             capabilities: [["gpu"]]
 
+    - name: Install nvitop with exporter support
+      ansible.builtin.pip:
+        name: 'nvitop[exporter]'
+        executable: pip3
+        state: present
+
+    - name: Deploy nvitop-exporter systemd service
+      ansible.builtin.template:
+        src: nvitop_exporter.service.j2
+        dest: /etc/systemd/system/nvitop-exporter.service
+        owner: root
+        group: root
+        mode: '0644'
+      notify:
+        - reload systemd
+        - restart nvitop-exporter
+
+    - name: Enable and start nvitop-exporter
+      ansible.builtin.systemd:
+        name: nvitop-exporter
+        enabled: true
+        state: started
+
 - name: Create Prometheus data directory
   file:
     path: /opt/prometheus/data

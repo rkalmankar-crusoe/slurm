@@ -1,0 +1,32 @@
+---
+# GB200 186GB NVL with InfiniBand instance configuration
+# Instance type: gb200-186gb-nvl-ib.4x
+# Architecture: ARM64 (Grace-Blackwell)
+# GPUs: 4x NVIDIA GB200 per node
+
+gpu_type: gb200-186gb-nvl-ib
+gpu_label: gb200
+gpu_count: "{{ instance_size }}"
+
+# CPU topology
+# GB200 has a fixed CPU configuration regardless of GPU count:
+# 128 CPUs total = 2 sockets × 32 cores × 2 threads
+cpu_count: 128
+sockets: 2
+cores_per_socket: 32
+threads_per_core: 2
+
+# Memory configuration (in MiB)
+# Physical RAM: ~186GB = 190464 MiB (fixed, not scaled by instance_size)
+real_memory: 190464
+
+# Architecture
+ansible_architecture: aarch64
+linux_arch: arm64
+
+# SLURM features
+slurm_features:
+  - gpu
+  - arm64
+  - gb200
+  - infiniband
