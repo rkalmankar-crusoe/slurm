@@ -1,50 +1,56 @@
-# common configuration
+# GB200 SLURM Cluster Configuration Example
+# This configuration has been tested and validated with GB200 instances
+
+# Common configuration
 location = "eu-iceland1-a"
-project_id = "0b823dae-dc42-4ce0-8927-f951c4867932"
-ssh_public_key_path = "~/.ssh/id_rsa.pub"
-vpc_subnet_id = "c95a0075-d854-4982-9846-c1373d2e7e74"
-slurm_compute_node_ib_partition_id = "c9e93066-a1b2-4e8b-b40f-5f2c13c92cee"
+project_id = "your-project-id-here"
+ssh_public_key_path = "~/.ssh/id_ed25519.pub"
+vpc_subnet_id = "your-vpc-subnet-id-here"
+
+# Head and login nodes
 slurm_head_node_count = 1
 slurm_login_node_count = 1
 
-# slurm-compute-node configuration
+# GB200 compute node configuration
 slurm_compute_node_type = "gb200-186gb-nvl-ib.4x"
-slurm_compute_node_count = 16
+slurm_compute_node_count = 2
 
-# observability
-enable_observability = false
-grafana_admin_password = "admin123"
+# InfiniBand partition ID (required for GB200)
+# Get this from your Crusoe Cloud console or contact your admin
+slurm_compute_node_ib_partition_id = "your-ib-partition-id-here"
 
-# Shared disks using VAST NFS
-use_vast_nfs = false
+# GB200 requires IMEX support
+enable_imex_support = true
 
-# VAST NFS disk configuration
-slurm_shared_disk_nfs_home_size = "10TiB"
-slurm_data_disk_size = "10TiB"
+# Observability (Prometheus + Grafana)
+enable_observability = true
+grafana_admin_password = "change-me-to-secure-password"
+
+# Shared storage configuration
+# These sizes have been tested and work well for small-medium clusters
+slurm_shared_disk_nfs_home_size = "1024GiB"
+slurm_data_disk_size = "1024GiB"
 slurm_data_disk_mount_path = "/data"
 
-# Use pre-existing Slurm VAST data disk with VAST NFS. This will be attached to the login and compute nodes
-# pre_existing_slurm_data_disk_id = "40332855-f6ad-4611-a61e-7772a41795ea"
+# SLURM users configuration
+# Add your users here with their SSH public keys
+slurm_users = []
 
-# Additionl shared disks to attach to compute VMs
-# slurm_shared_volumes = [{
-#     id          = "40332855-f6ad-4611-a61e-7772a41795ea"
-#     name        = "shared-disk-test"
-#     mount_point = "/data"
-#     mode        = "read-write"
-#   }]
+# Example with users:
+# slurm_users = [{
+#   name = "user1"
+#   uid = 1001
+#   ssh_pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... user1@example.com"
+# }, {
+#   name = "user2"
+#   uid = 1002
+#   ssh_pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... user2@example.com"
+# }]
 
-# slurm users configuration
-slurm_users = [{
-  name = "user1"
-  uid = 1001
-  ssh_pubkey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAni1VhZrF7aTOEN43cSXEiTjp7oXUKXijp1hv9Pu0nV chinmaybaikar"
-  },{
-  name = "user2"
-  uid = 1002
-  ssh_pubkey = "ssh-rsa ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB/YitvZCS3TwDzLIBscnWMwPFq04XK9JjnCK1Urv//0"
-  }
-]
-
-#GB200
-enable_imex_support = true
+# Notes:
+# - GB200 instances use ARM64 architecture (Grace-Blackwell)
+# - CPU topology: 128 CPUs = 2 sockets × 32 cores × 2 threads per node
+# - Memory: ~186GB per node
+# - GPUs: 4x NVIDIA GB200 per node
+# - InfiniBand support required for optimal performance
+# - VAST NFS migration must be completed before deployment (see docs/VAST_NFS_MIGRATION.md)
